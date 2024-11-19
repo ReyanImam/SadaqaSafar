@@ -1,10 +1,5 @@
-import axios from 'axios';
 import Cause from '../models/Cause.js';
-
-// Create axios instance with base URL
-const api = axios.create({
-  baseURL: 'http://localhost:3000/api', // Adjust this to match your backend port
-});
+import mongoose from 'mongoose';
 
 export const createCause = async (req, res) => {
   try {
@@ -20,10 +15,13 @@ export const createCause = async (req, res) => {
       goalAmount,
       category,
       endDate,
-      ngo: req.user._id,
+      ngo: req.ngo._id,
+      raisedAmount: 0,
     });
 
+    console.log('Creating new cause for NGO:', req.ngo._id);
     const savedCause = await newCause.save();
+    console.log('Saved cause:', savedCause);
     res.status(201).json(savedCause);
   } catch (error) {
     console.error('Error in createCause:', error);
@@ -31,30 +29,22 @@ export const createCause = async (req, res) => {
   }
 };
 
-export const getCauses = async () => {
-  try {
-    const response = await api.get('/causes');
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
-};
+
 
 export const getNGOCauses = async (req, res) => {
   try {
     const { ngoId } = req.params;
     console.log('Fetching causes for NGO:', ngoId);
     
-    if (!ngoId) {
-      return res.status(400).json({ message: 'NGO ID is required' });
+    if (!mongoose.Types.ObjectId.isValid(ngoId)) {
+      return res.status(400).json({ message: 'Invalid NGO ID format' });
     }
 
     const causes = await Cause.find({ ngo: ngoId });
-    console.log('Causes found:', causes.length);
-    
+    console.log('Found causes for NGO:', causes.length);
     res.json(causes);
   } catch (error) {
     console.error('Error in getNGOCauses:', error);
-    res.status(500).json({ message: 'Server error', error: error.message, stack: error.stack });
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 };

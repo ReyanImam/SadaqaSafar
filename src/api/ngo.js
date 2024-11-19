@@ -2,12 +2,27 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:3000/api';
 
-export const getNGOs = async () => {
-  const response = await axios.get(`${API_URL}/ngos`);
-  return response.data;
-};
+const api = axios.create({
+  baseURL: API_URL,
+});
 
 export const getNGOById = async (id) => {
-  const response = await axios.get(`${API_URL}/ngos/${id}`);
-  return response.data;
+  try {
+    const response = await api.get(`/ngos/${id}`);
+    console.log('NGO data fetched:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching NGO:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export const getNGOs = async () => {
+  try {
+    const response = await api.get('/ngos');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching NGOs:', error.response?.data || error.message);
+    throw error;
+  }
 };

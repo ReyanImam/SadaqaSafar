@@ -10,11 +10,7 @@ const causeSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  ngo: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'NGO',
-    required: true
-  },
+  ngo: { type: mongoose.Schema.Types.ObjectId, ref: 'NGO', required: true },
   goalAmount: {
     type: Number,
     required: true

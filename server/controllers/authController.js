@@ -45,12 +45,7 @@ export const registerNGO = async (req, res) => {
       return res.status(400).json({ message: 'NGO already exists' });
     }
 
-    const user = await User.create({
-      name,
-      email,
-      password,
-      role: 'ngo'
-    });
+  
 
     const ngo = await NGO.create({
       name,
@@ -61,15 +56,15 @@ export const registerNGO = async (req, res) => {
       contactNumber,
       registrationNumber,
       logo,
-      user: user._id
+      
     });
 
-    const token = generateToken(user._id, user.role);
+    const token = generateToken(ngo._id,"ngo");
     res.status(201).json({
       _id: ngo._id,
       name: ngo.name,
       email: ngo.email,
-      role: user.role,
+      role: "ngo",
       token
     });
   } catch (error) {
