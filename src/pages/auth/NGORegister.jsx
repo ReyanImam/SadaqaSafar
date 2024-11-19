@@ -65,8 +65,8 @@ export default function NGORegister() {
   return (
     <div className="max-w-md mx-auto">
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Register NGO</h1>
-        <p className="mt-2 text-gray-600">Join us in making a difference</p>
+        <h1 className="text-3xl font-bold text-gray-900  dark:text-white">Register NGO</h1>
+        <p className="mt-2 text-gray-500">Join us in making a difference</p>
       </div>
 
       <form onSubmit={handleSubmit} className="bg-white p-8 rounded-xl shadow-sm">
@@ -207,7 +207,7 @@ export default function NGORegister() {
           </button>
         </div>
 
-        <div className="mt-6 text-center text-gray-600">
+        <div className="mt-6 text-center text-gray-500">
           <p>
             Already registered?{' '}
             <Link to="/login-ngo" className="text-emerald-600 hover:text-emerald-700">

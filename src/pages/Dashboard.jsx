@@ -48,7 +48,7 @@ const Dashboard = () => {
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">NGO Dashboard</h1>
+        <h1 className="text-2xl font-bold text-gray-900  dark:text-white">NGO Dashboard</h1>
         <button 
           onClick={() => setShowCauseModal(true)}
           className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition flex items-center gap-2"

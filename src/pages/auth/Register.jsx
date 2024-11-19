@@ -54,8 +54,8 @@ const Register = () => {
   return (
     <div className="max-w-md mx-auto">
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Create Account</h1>
-        <p className="mt-2 text-gray-600">Join us in making a difference</p>
+        <h1 className="text-3xl font-bold text-gray-900  dark:text-white">Create Account</h1>
+        <p className="mt-2 text-gray-500">Join us in making a difference</p>
       </div>
 
       <form onSubmit={handleSubmit} className="bg-white p-8 rounded-xl shadow-sm">
@@ -136,7 +136,7 @@ const Register = () => {
           </button>
         </div>
 
-        <div className="mt-6 text-center text-gray-600">
+        <div className="mt-6 text-center text-gray-500">
           <p>
             Already have an account?{' '}
             <Link to="/login" className="text-emerald-600 hover:text-emerald-700">
