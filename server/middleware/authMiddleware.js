@@ -10,7 +10,7 @@ export const protect = async (req, res, next) => {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
       // Look for the NGO in the database
-      const ngo = await NGO.findById(decoded._id).select('-password');
+      const ngo = await NGO.findById(decoded.id).select('-password');
       if (!ngo) {
         return res.status(401).json({ message: 'Not authorized as NGO' });
       }

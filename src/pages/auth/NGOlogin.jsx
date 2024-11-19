@@ -27,7 +27,7 @@ export default function NGOLogin() {
       }
       setUser(response);
       setToken(response.token);
-      navigate('/ngo-dashboard');
+      navigate('/');
     } catch (err) {
       setError(err.response?.data?.message || 'NGO Login failed');
     } finally {

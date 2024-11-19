@@ -38,36 +38,36 @@ export const register = async (req, res) => {
 
 export const registerNGO = async (req, res) => {
   try {
-    const { name, email, password, description, domain, location,registrationNumber, contactNumber,logo } = req.body;
+    const { name, email, password, description, domain, location, registrationNumber, contactNumber, logo } = req.body;
     const ngoExists = await NGO.findOne({ email });
 
     if (ngoExists) {
       return res.status(400).json({ message: 'NGO already exists' });
     }
 
-  
-
     const ngo = await NGO.create({
       name,
       email,
+      password,
       description,
       domain,
       location,
       contactNumber,
       registrationNumber,
       logo,
-      
+      role: 'ngo' // Add this line to explicitly set the role
     });
 
-    const token = generateToken(ngo._id,"ngo");
+    const token = generateToken(ngo._id, 'ngo');
     res.status(201).json({
       _id: ngo._id,
       name: ngo.name,
       email: ngo.email,
-      role: "ngo",
+      role: 'ngo',
       token
     });
   } catch (error) {
+    console.error('NGO Registration Error:', error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -90,6 +90,41 @@ export const login = async (req, res) => {
       token
     });
   } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const loginNGO = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    console.log('Attempting NGO login for email:', email);
+    
+    const ngo = await NGO.findOne({ email });
+   
+
+    if (!ngo) {
+      
+      return res.status(401).json({ message: 'Invalid email or password' });
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, ngo.password);
+    
+
+    if (!isPasswordValid) {
+      
+      return res.status(401).json({ message: 'Invalid email or password' });
+    }
+
+    const token = generateToken(ngo._id, 'ngo');
+    res.json({
+      _id: ngo._id,
+      name: ngo.name,
+      email: ngo.email,
+      role: 'ngo',
+      token
+    });
+  } catch (error) {
+    console.error('NGO Login Error:', error);
     res.status(500).json({ message: error.message });
   }
 };
