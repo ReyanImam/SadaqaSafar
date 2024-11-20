@@ -7,7 +7,7 @@ import { registerNGO } from '../../api/auth';
 
 export default function NGORegister() {
   const navigate = useNavigate();
-  const { setUser, setToken } = useAuthStore();
+  const { setNGO, setToken } = useAuthStore();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -43,7 +43,8 @@ export default function NGORegister() {
         logo: formData.logo // Include logo in the submission data
       });
       
-      setUser(response);
+      // setUser(response);
+      setNGO(response)
       setToken(response.token);
       navigate('/ngo-dashboard');
     } catch (err) {

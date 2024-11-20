@@ -5,12 +5,14 @@ const useAuthStore = create(
   persist(
     (set, get) => ({
       user: null,
+      ngo: null,
       token: null,
       
       setUser: (user) => set({ user }),
+      setNGO: (ngo) => set({ ngo }),
       setToken: (token) => set({ token }),
       login: (user, token) => set({ user, token }),
-      logout: () => set({ user: null, token: null }),
+      logout: () => set({ user: null, token: null, ngo: null }),
       
       isAuthenticated: () => {
         const state = get();

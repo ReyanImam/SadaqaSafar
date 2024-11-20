@@ -3,14 +3,24 @@ import { useParams, Link } from 'react-router-dom';
 import { Building2, MapPin, Calendar, DollarSign } from 'lucide-react';
 import { getNGOById } from '../api/ngo';
 import { getNGOCauses } from '../api/causes';
+import DonateModal from '../components/DonateModal';
+import useAuthStore from '../store/authStore';
+
 
 
 const NGODetails = () => {
+  const { user, token} = useAuthStore();
   const { id } = useParams();
   const [ngo, setNGO] = useState(null);
   const [causes, setCauses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+
+  const [showModal, setShowModal] = useState(false); //a
+  const [selectedCause, setSelectedCause] = useState(null); //a
+
+  console.log(token)
 
   useEffect(() => {
     const fetchNGOAndCauses = async () => {
@@ -22,18 +32,18 @@ const NGODetails = () => {
         console.log('Fetching NGO details for ID:', id);
         const ngoData = await getNGOById(id);
         console.log('Fetched NGO data:', ngoData);
-        
+
         if (!ngoData) {
           throw new Error('NGO not found');
         }
-        
+
         setNGO(ngoData);
         console.log('NGO Data ID:', ngoData._id);
 
         console.log('Fetching causes for NGO ID:', ngoData._id);
         const causesData = await getNGOCauses(ngoData._id);
         console.log('Fetched causes data:', causesData);
-        
+
         if (Array.isArray(causesData)) {
           setCauses(causesData);
         } else {
@@ -50,6 +60,17 @@ const NGODetails = () => {
 
     fetchNGOAndCauses();
   }, [id]);
+
+
+  const handleDonateClick = (cause) => { //a
+    setSelectedCause(cause);
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => { //a
+    setShowModal(false);
+    setSelectedCause(null);
+  };
 
   if (loading) {
     return (
@@ -91,6 +112,7 @@ const NGODetails = () => {
           )}
         </div>
       </div>
+      {!user && <div className='text-center text-2xl  text-gray-900 font-bold'>LOGIN AS USER TO MAKE DONATIONS</div>}
 
       <h2 className="text-2xl font-bold text-gray-900 mb-4">Active Causes</h2>
       {causes.length === 0 ? (
@@ -133,19 +155,30 @@ const NGODetails = () => {
                     <DollarSign className="w-4 h-4 inline mr-1" />
                     <span>{cause.raisedAmount || 0}</span> / <span>{cause.goalAmount}</span>
                   </div>
-                  <Link
+                  {/* <Link
                     to={`/donate/${cause._id}`}
                     className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition"
                   >
                     Donate Now
-                  </Link>
+                  </Link> */}
+
+                  {user && <button onClick={() => handleDonateClick(cause)}
+                    className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition"
+                  >
+                    Donate Now
+                  </button>}
                 </div>
               </div>
             </div>
           ))}
         </div>
       )}
+      {showModal && selectedCause && (
+        <DonateModal cause={selectedCause} onClose={handleCloseModal} />
+      )}
     </div>
+
+
   );
 };
 

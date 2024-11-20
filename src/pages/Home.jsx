@@ -4,7 +4,7 @@ import { Heart, Users, Building2, ArrowRight } from 'lucide-react';
 import useAuthStore from '../store/authStore'; // Import auth store
 
 const Home = () => {
-  const { user } = useAuthStore();
+  const { user, ngo } = useAuthStore();
 
   return (
     <div className="space-y-16">
@@ -26,7 +26,7 @@ const Home = () => {
             <ArrowRight className="ml-2 h-5 w-5" />
           </Link>
           {/* Conditionally render these buttons based on whether a user is logged in */}
-          {!user && (
+          {!user && !ngo && (
             <>
               <Link
                 to="/ngo-register"

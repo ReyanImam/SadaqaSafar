@@ -4,7 +4,7 @@ import { Heart, LogIn, UserPlus, LogOut, User } from 'lucide-react';
 import useAuthStore from '../store/authStore';
 
 const Navbar = () => {
-  const { user, logout } = useAuthStore();
+  const { user, ngo, logout } = useAuthStore();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -38,11 +38,11 @@ const Navbar = () => {
           </div>
 
           <div className="flex items-center space-x-4">
-            {user ? (
+            {(user || ngo) ? (
               <>
                 <div className="flex items-center space-x-2 text-gray-600">
                   <User className="h-5 w-5" />
-                  <span>{user.name}</span>
+                  <span>{ngo?ngo.name:user.name}</span>
                 </div>
                 <button
                   onClick={handleLogout}

@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import NGO from '../models/NGO.js';
+import User from '../models/User.js';
 
 export const protect = async (req, res, next) => {
   try {
@@ -11,12 +12,13 @@ export const protect = async (req, res, next) => {
 
       // Look for the NGO in the database
       const ngo = await NGO.findById(decoded.id).select('-password');
-      if (!ngo) {
+      const user = await User.findById(decoded.id).select('-password');
+      if (!ngo && !user) {
         return res.status(401).json({ message: 'Not authorized as NGO' });
       }
 
-      // Attach NGO to the request object
-      req.ngo = ngo;
+      if (ngo) {req.ngo = ngo}
+      else {req.user = user}
       next();
     } else {
       res.status(401).json({ message: 'Not authorized, no token' });
