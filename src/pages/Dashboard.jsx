@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { createCause, getNGOCauses } from '../api/causes';
 import { getConversations, getMessages, sendMessage } from '../api/messages';
 import useAuthStore from '../store/authStore';
@@ -7,7 +7,7 @@ import ChatSidebar from '../components/sidebar';
 import ChatWindow from '../components/chatwindow';
 
 export default function NGODashboard() {
-  const { user, token } = useAuthStore();
+  const { ngo, token } = useAuthStore();
   const [showCauseModal, setShowCauseModal] = useState(false);
   const [showChatInterface, setShowChatInterface] = useState(false);
   const [causes, setCauses] = useState([]);
@@ -34,7 +34,7 @@ export default function NGODashboard() {
         clearInterval(messagePollingInterval.current);
       }
     };
-  }, [user._id]);
+  }, [ngo._id]);
 
   useEffect(() => {
     if (selectedConversation) {
@@ -52,10 +52,10 @@ export default function NGODashboard() {
   }, [selectedConversation]);
 
   const fetchCauses = async () => {
-    if (!user || !user._id) return;
+    if (!ngo || !ngo._id) return;
     try {
       setLoading(true);
-      const fetchedCauses = await getNGOCauses(user._id);
+      const fetchedCauses = await getNGOCauses(ngo._id);
       setCauses(fetchedCauses);
     } catch (error) {
       setError('Failed to fetch causes. Please try again.');

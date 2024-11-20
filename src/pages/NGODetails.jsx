@@ -3,13 +3,11 @@ import { useParams, Link } from 'react-router-dom';
 import { Building2, MapPin, Calendar, DollarSign, MessageCircle, Send, X } from 'lucide-react';
 import { getNGOById } from '../api/ngo';
 import { getNGOCauses } from '../api/causes';
+import { sendMessage, createConversation, getMessages } from '../api/messages';
 import useAuthStore from '../store/authStore';
 import DonateModal from '../components/DonateModal';
 
-
-
 const NGODetails = () => {
-  const { user, token } = useAuthStore();
   const { id } = useParams();
   const [ngo, setNGO] = useState(null);
   const [causes, setCauses] = useState([]);
@@ -19,8 +17,12 @@ const NGODetails = () => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [currentConversation, setCurrentConversation] = useState(null);
+  const { user, token } = useAuthStore();
   const messagesEndRef = useRef(null);
   const messagePollingInterval = useRef(null);
+
+  const [showModal, setShowModal] = useState(false); 
+  const [selectedCause, setSelectedCause] = useState(null); 
 
   useEffect(() => {
     fetchNGOAndCauses();
@@ -30,12 +32,6 @@ const NGODetails = () => {
       }
     };
   }, [id]);
-
-
-  const [showModal, setShowModal] = useState(false); //a
-  const [selectedCause, setSelectedCause] = useState(null); //a
-
-  console.log(token)
 
   useEffect(() => {
     if (showChat) {
@@ -73,27 +69,11 @@ const NGODetails = () => {
         throw new Error('NGO ID is required');
       }
 
-      console.log('Fetching NGO details for ID:', id);
       const ngoData = await getNGOById(id);
-      console.log('Fetched NGO data:', ngoData);
-
-      if (!ngoData) {
-        throw new Error('NGO not found');
-      }
-
       setNGO(ngoData);
-      console.log('NGO Data ID:', ngoData._id);
 
-      console.log('Fetching causes for NGO ID:', ngoData._id);
-      const causesData = await getNGOCauses(ngoData._id);
-      console.log('Fetched causes data:', causesData);
-
-      if (Array.isArray(causesData)) {
-        setCauses(causesData);
-      } else {
-        console.error('Causes data is not an array:', causesData);
-        setCauses([]);
-      }
+      const causesData = await getNGOCauses(id);
+      setCauses(Array.isArray(causesData) ? causesData : []);
     } catch (error) {
       console.error('Error fetching NGO details:', error);
       setError(error.message || 'An error occurred while fetching data');
@@ -126,18 +106,6 @@ const NGODetails = () => {
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
-
-
-  const handleDonateClick = (cause) => { //a
-    setSelectedCause(cause);
-    setShowModal(true);
-  };
-
-  const handleCloseModal = () => { //a
-    setShowModal(false);
-    setSelectedCause(null);
-  };
-
 
   const handleDonateClick = (cause) => { //a
     setSelectedCause(cause);
@@ -190,7 +158,6 @@ const NGODetails = () => {
           )}
         </div>
       </div>
-      {!user && <div className='text-center text-2xl  text-gray-900 font-bold'>LOGIN AS USER TO MAKE DONATIONS</div>}
 
       {/* Causes Section */}
       <h2 className="text-2xl font-bold text-gray-900 mb-4">Active Causes</h2>
@@ -234,12 +201,6 @@ const NGODetails = () => {
                     <DollarSign className="w-4 h-4 inline mr-1" />
                     <span>{cause.raisedAmount || 0}</span> / <span>{cause.goalAmount}</span>
                   </div>
-                  {/* <Link
-                    to={`/donate/${cause._id}`}
-                    className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition"
-                  >
-                    Donate Now
-                  </Link> */}
 
                   {user && <button onClick={() => handleDonateClick(cause)}
                     className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition"
@@ -252,13 +213,65 @@ const NGODetails = () => {
           ))}
         </div>
       )}
+
+      {/* Chat Button & Window */}
+      {user && user.role === 'user' && (
+        <button
+          onClick={() => setShowChat(!showChat)}
+          className="fixed bottom-4 right-4 bg-emerald-600 text-white p-3 rounded-full shadow-lg hover:bg-emerald-700 transition"
+        >
+          <MessageCircle className="w-6 h-6" />
+        </button>
+      )}
+
+      {showChat && (
+        <div className="fixed inset-y-0 right-0 w-80 bg-white shadow-xl transform transition-transform duration-300 ease-in-out">
+          <div className="h-full flex flex-col">
+            <div className="p-4 bg-emerald-600 text-white flex justify-between items-center">
+              <h3 className="text-lg font-semibold">Chat with {ngo.name}</h3>
+              <button onClick={() => setShowChat(false)} className="text-white hover:text-gray-200">
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            <div className="flex-grow overflow-y-auto p-4">
+              {messages.map((msg, index) => (
+                <div key={index} className={`mb-2 ${msg.sender.id === user._id ? 'text-right' : 'text-left'}`}>
+                  <div className={`inline-block p-2 rounded-lg ${msg.sender.id === user._id ? 'bg-emerald-100' : 'bg-gray-100'}`}>
+                    {msg.message}
+                  </div>
+                </div>
+              ))}
+              <div ref={messagesEndRef} />
+            </div>
+            <div className="p-4 border-t">
+              <div className="flex">
+                <input
+                  type="text"
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                  placeholder="Type a message..."
+                  className="flex-grow px-3 py-2 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                />
+                <button
+                  onClick={handleSendMessage}
+                  className="bg-emerald-600 text-white px-4 py-2 rounded-r-lg hover:bg-emerald-700 transition"
+                >
+                  <Send className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {showModal && selectedCause && (
         <DonateModal cause={selectedCause} onClose={handleCloseModal} />
       )}
     </div>
-
-
   );
 };
 
 export default NGODetails;
+
+

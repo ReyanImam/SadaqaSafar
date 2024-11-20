@@ -20,12 +20,12 @@ const Navbar = () => {
             <Heart className="h-8 w-8 text-emerald-600" />
             <span className="text-xl font-bold text-gray-800">SadaqaSafar</span>
           </Link>
-          
+
           <div className="hidden md:flex items-center space-x-8">
             <Link to="/ngos" className="text-gray-600 hover:text-emerald-600">
               NGOs
             </Link>
-            {user?.role === 'ngo' && (
+            {/* {user?.role === 'ngo' && (
               <Link to="/dashboard" className="text-gray-600 hover:text-emerald-600">
                 Dashboard
               </Link>
@@ -34,7 +34,19 @@ const Navbar = () => {
               <Link to="/donations" className="text-gray-600 hover:text-emerald-600">
                 My Donations
               </Link>
-            )}
+            )} */}
+
+
+            {ngo?
+              <Link to="/dashboard" className="text-gray-600 hover:text-emerald-600">
+                Dashboard
+              </Link>
+            
+            : 
+              <Link to="/donations" className="text-gray-600 hover:text-emerald-600">
+                My Donations
+              </Link>
+            }
           </div>
 
           <div className="flex items-center space-x-4">
@@ -42,7 +54,7 @@ const Navbar = () => {
               <>
                 <div className="flex items-center space-x-2 text-gray-600">
                   <User className="h-5 w-5" />
-                  <span>{ngo?ngo.name:user.name}</span>
+                  <span>{ngo ? ngo.name : user.name}</span>
                 </div>
                 <button
                   onClick={handleLogout}
