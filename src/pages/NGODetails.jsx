@@ -160,21 +160,16 @@ const NGODetails = () => {
       </div>
 
       {/* Causes Section */}
-      <h2 className="text-2xl font-bold text-gray-900 mb-4">Active Causes</h2>
+      <h2 className="text-2xl font-bold text-gray-900 mb-4  dark:text-white">Active Causes</h2>
       {causes.length === 0 ? (
-        <p className="text-center text-gray-500">No active causes at the moment.</p>
+        <p className="text-center text-gray-500  dark:text-white">No active causes at the moment.</p>
       ) : (
         <div className="grid md:grid-cols-2 gap-6">
           {causes.map((cause) => (
             <div key={cause._id} className="bg-white rounded-xl shadow-md overflow-hidden">
-              <img
-                src={cause.images?.[0] || 'https://via.placeholder.com/800x300'}
-                alt={cause.title}
-                className="w-full h-48 object-cover"
-              />
               <div className="p-6">
-                <h3 className="text-xl font-semibold text-gray-900 mb-2  dark:text-white">{cause.title}</h3>
-                <p className="text-gray-500 mb-4">{cause.description}</p>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">{cause.title}</h3>
+                <p className="text-gray-500  dark:text-gray-500 mb-4">{cause.description}</p>
                 <div className="flex justify-between items-center mb-4">
                   <div className="flex items-center text-gray-500">
                     <Calendar className="w-4 h-4 mr-1" />
