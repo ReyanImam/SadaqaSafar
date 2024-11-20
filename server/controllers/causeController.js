@@ -9,17 +9,22 @@ export const createCause = async (req, res) => {
       return res.status(400).json({ message: 'Please provide all required fields' });
     }
 
+    // Ensure that req.auth exists and contains the NGO's ID
+    if (!req.auth || !req.auth.id) {
+      return res.status(401).json({ message: 'Authentication failed. NGO ID not found.' });
+    }
+
     const newCause = new Cause({
       title,
       description,
       goalAmount,
       category,
       endDate,
-      ngo: req.ngo._id,
+      ngo: req.auth.id, // Use req.auth.id to set the NGO
       raisedAmount: 0,
     });
 
-    console.log('Creating new cause for NGO:', req.ngo._id);
+    console.log('Creating new cause for NGO:', req.auth.id);
     const savedCause = await newCause.save();
     console.log('Saved cause:', savedCause);
     res.status(201).json(savedCause);
@@ -28,6 +33,8 @@ export const createCause = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+
+// ... other controller functions ...
 
 
 
