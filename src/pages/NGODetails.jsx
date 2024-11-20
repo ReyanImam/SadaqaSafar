@@ -1,20 +1,35 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Building2, MapPin, Calendar, DollarSign } from 'lucide-react';
+import { Building2, MapPin, Calendar, DollarSign, MessageCircle, Send, X } from 'lucide-react';
 import { getNGOById } from '../api/ngo';
 import { getNGOCauses } from '../api/causes';
-import DonateModal from '../components/DonateModal';
 import useAuthStore from '../store/authStore';
+import DonateModal from '../components/DonateModal';
 
 
 
 const NGODetails = () => {
-  const { user, token} = useAuthStore();
+  const { user, token } = useAuthStore();
   const { id } = useParams();
   const [ngo, setNGO] = useState(null);
   const [causes, setCauses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showChat, setShowChat] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState('');
+  const [currentConversation, setCurrentConversation] = useState(null);
+  const messagesEndRef = useRef(null);
+  const messagePollingInterval = useRef(null);
+
+  useEffect(() => {
+    fetchNGOAndCauses();
+    return () => {
+      if (messagePollingInterval.current) {
+        clearInterval(messagePollingInterval.current);
+      }
+    };
+  }, [id]);
 
 
   const [showModal, setShowModal] = useState(false); //a
@@ -23,43 +38,105 @@ const NGODetails = () => {
   console.log(token)
 
   useEffect(() => {
-    const fetchNGOAndCauses = async () => {
-      try {
-        if (!id) {
-          throw new Error('NGO ID is required');
-        }
-
-        console.log('Fetching NGO details for ID:', id);
-        const ngoData = await getNGOById(id);
-        console.log('Fetched NGO data:', ngoData);
-
-        if (!ngoData) {
-          throw new Error('NGO not found');
-        }
-
-        setNGO(ngoData);
-        console.log('NGO Data ID:', ngoData._id);
-
-        console.log('Fetching causes for NGO ID:', ngoData._id);
-        const causesData = await getNGOCauses(ngoData._id);
-        console.log('Fetched causes data:', causesData);
-
-        if (Array.isArray(causesData)) {
-          setCauses(causesData);
-        } else {
-          console.error('Causes data is not an array:', causesData);
-          setCauses([]);
-        }
-      } catch (error) {
-        console.error('Error fetching NGO details:', error);
-        setError(error.message || 'An error occurred while fetching data');
-      } finally {
-        setLoading(false);
+    if (showChat) {
+      initializeChat();
+    } else {
+      if (messagePollingInterval.current) {
+        clearInterval(messagePollingInterval.current);
       }
-    };
+    }
+  }, [showChat]);
 
-    fetchNGOAndCauses();
-  }, [id]);
+  const initializeChat = async () => {
+    try {
+      // Create or get existing conversation
+      const conversationResponse = await createConversation(id, 'NGO', token);
+      setCurrentConversation(conversationResponse);
+
+      // Fetch initial messages
+      const messagesResponse = await getMessages(conversationResponse._id, token);
+      setMessages(messagesResponse.messages || []);
+
+      // Set up polling for new messages
+      messagePollingInterval.current = setInterval(async () => {
+        const updatedMessages = await getMessages(conversationResponse._id, token);
+        setMessages(updatedMessages.messages || []);
+      }, 3000); // Poll every 3 seconds
+    } catch (error) {
+      console.error('Error initializing chat:', error);
+    }
+  };
+
+  const fetchNGOAndCauses = async () => {
+    try {
+      if (!id) {
+        throw new Error('NGO ID is required');
+      }
+
+      console.log('Fetching NGO details for ID:', id);
+      const ngoData = await getNGOById(id);
+      console.log('Fetched NGO data:', ngoData);
+
+      if (!ngoData) {
+        throw new Error('NGO not found');
+      }
+
+      setNGO(ngoData);
+      console.log('NGO Data ID:', ngoData._id);
+
+      console.log('Fetching causes for NGO ID:', ngoData._id);
+      const causesData = await getNGOCauses(ngoData._id);
+      console.log('Fetched causes data:', causesData);
+
+      if (Array.isArray(causesData)) {
+        setCauses(causesData);
+      } else {
+        console.error('Causes data is not an array:', causesData);
+        setCauses([]);
+      }
+    } catch (error) {
+      console.error('Error fetching NGO details:', error);
+      setError(error.message || 'An error occurred while fetching data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSendMessage = async () => {
+    if (!newMessage.trim() || !token || !currentConversation) return;
+
+    try {
+      const messageResponse = await sendMessage(
+        currentConversation._id,
+        newMessage,
+        token
+      );
+
+      setMessages(prev => [...prev, messageResponse.message]);
+      setNewMessage('');
+    } catch (error) {
+      console.error('Error sending message:', error);
+    }
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+
+  const handleDonateClick = (cause) => { //a
+    setSelectedCause(cause);
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => { //a
+    setShowModal(false);
+    setSelectedCause(null);
+  };
 
 
   const handleDonateClick = (cause) => { //a
@@ -89,7 +166,8 @@ const NGODetails = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
+    <div className="max-w-4xl mx-auto px-4 py-8 relative">
+      {/* NGO Details Section */}
       <div className="bg-white rounded-xl shadow-md overflow-hidden mb-8">
         <img
           src={ngo.logo || 'https://via.placeholder.com/800x300'}
@@ -114,6 +192,7 @@ const NGODetails = () => {
       </div>
       {!user && <div className='text-center text-2xl  text-gray-900 font-bold'>LOGIN AS USER TO MAKE DONATIONS</div>}
 
+      {/* Causes Section */}
       <h2 className="text-2xl font-bold text-gray-900 mb-4">Active Causes</h2>
       {causes.length === 0 ? (
         <p className="text-center text-gray-600">No active causes at the moment.</p>
