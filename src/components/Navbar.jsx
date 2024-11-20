@@ -1,8 +1,29 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Heart, LogIn, UserPlus, LogOut, User, Cog, Sun, Moon } from 'lucide-react';
+import {
+  Heart,
+  LogIn,
+  UserPlus,
+  LogOut,
+  User,
+  Cog,
+  Sun,
+  Moon,
+  Building2,
+  MoreVertical,
+  Info,
+} from "lucide-react";
 import useAuthStore from "../store/authStore";
 import useThemeStore from "../store/themeStore";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Navbar = () => {
   const { user, logout } = useAuthStore();
@@ -20,79 +41,196 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-16">
           <Link to="/" className="flex items-center space-x-2">
             <Heart className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
-            <span className="text-xl font-bold text-gray-800 dark:text-white">SadaqaSafar</span>
+            <span className="text-xl font-bold text-gray-800 dark:text-white">
+              SadaqaSafar
+            </span>
           </Link>
 
-          <div className="hidden md:flex items-center space-x-8">
-            <Link to="/ngos" className="text-gray-500 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400">
-              NGOs
-            </Link>
-            {user?.role === "ngo" && (
-              <Link
-                to="/dashboard"
-                className="text-gray-500 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400"
-              >
-                Dashboard
-              </Link>
-            )}
-            {user?.role === "user" && (
-              <Link
-                to="/donations"
-                className="text-gray-500 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400"
-              >
-                My Donations
-              </Link>
-            )}
-          </div>
-
           <div className="flex items-center space-x-4">
-            <button
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center space-x-4">
+              <Link
+                to="/ngos"
+                className="flex items-center space-x-2 px-2 py-2 rounded-lg text-gray-500 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200"
+              >
+                <Building2 className="h-5 w-5" />
+                <span>NGOs</span>
+              </Link>
+
+              {user?.role === "ngo" && (
+                <Link
+                  to="/dashboard"
+                  className="flex items-center space-x-2 py-2 rounded-lg text-gray-500 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200"
+                >
+                  <User className="h-5 w-5" />
+                  <span>Dashboard</span>
+                </Link>
+              )}
+
+              {user?.role === "user" && (
+                <Link
+                  to="/donations"
+                  className="flex items-center space-x-2 py-2 rounded-lg text-gray-500 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200"
+                >
+                  <Heart className="h-5 w-5" />
+                  <span>My Donations</span>
+                </Link>
+              )}
+
+              <Link
+                to="/AppSetting"
+                className="flex items-center space-x-2 px-4 py-2 rounded-lg text-gray-500 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200"
+              >
+                <Cog className="h-5 w-5" />
+                <span>App Setting</span>
+              </Link>
+
+              <Link
+                to="/About"
+                className="flex items-center space-x-2 py-2 rounded-lg text-gray-500 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200"
+              >
+                <Info className="h-5 w-5" />
+                <span>About Us</span>
+              </Link>
+
+              {user ? (
+                <>
+                  <div className="flex items-center space-x-2 text-gray-500 dark:text-gray-300">
+                    <User className="h-5 w-5" />
+                    <span>{user.name}</span>
+                  </div>
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center space-x-2 px-4 py-2 rounded-lg text-gray-500 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200"
+                  >
+                    <LogOut className="h-5 w-5" />
+                    <span>Logout</span>
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    className="flex items-center space-x-2 px-4 py-2 rounded-lg text-gray-500 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200"
+                  >
+                    <LogIn className="h-5 w-5" />
+                    <span>Login</span>
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600 transition-all duration-200"
+                  >
+                    <UserPlus className="h-5 w-5" />
+                    <span>Register</span>
+                  </Link>
+                </>
+              )}
+            </div>
+
+            {/* Dark Mode Toggle (visible on both mobile and desktop) */}
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={toggleTheme}
-              className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200"
+              className="text-gray-800 dark:text-gray-200"
               aria-label="Toggle dark mode"
             >
-              {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-            </button>
+              {isDarkMode ? (
+                <Sun className="h-5 w-5" />
+              ) : (
+                <Moon className="h-5 w-5" />
+              )}
+            </Button>
 
-            {user ? (
-              <>
-                <div className="flex items-center space-x-2 text-gray-500 dark:text-gray-300">
-                  <User className="h-5 w-5" />
-                  <span>{user.name}</span>
-                </div>
-                <button
-                  onClick={handleLogout}
-                  className="flex items-center space-x-1 px-4 py-2 rounded-lg text-gray-500 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400"
-                >
-                  <LogOut className="h-5 w-5" />
-                  <span>Logout</span>
-                </button>
-              </>
-            ) : (
-              <>
-                <Link
-                  to="/AppSetting"
-                  className="flex items-center space-x-1 px-4 py-2 rounded-lg text-gray-500 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400"
-                >
-                  <Cog className="h-5 w-5" />
-                  <span>App Setting</span>
-                </Link>
-                <Link
-                  to="/login"
-                  className="flex items-center space-x-1 px-4 py-2 rounded-lg text-gray-500 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400"
-                >
-                  <LogIn className="h-5 w-5" />
-                  <span>Login</span>
-                </Link>
-                <Link
-                  to="/register"
-                  className="flex items-center space-x-1 px-4 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600"
-                >
-                  <UserPlus className="h-5 w-5" />
-                  <span>Register</span>
-                </Link>
-              </>
-            )}
+            {/* Mobile Navigation */}
+            <div className="md:hidden">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <MoreVertical className="h-5 w-5" />
+                    <span className="sr-only">More options</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>Menu</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/ngos" className="flex items-center w-full">
+                      <Building2 className="mr-2 h-4 w-4" />
+                      <span>NGOs</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/about" className="flex items-center w-full">
+                      <Info className="mr-2 h-4 w-4" />
+                      <span>About Us</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  {user ? (
+                    <>
+                      <DropdownMenuItem>
+                        <User className="mr-2 h-4 w-4" />
+                        <span>{user.name}</span>
+                      </DropdownMenuItem>
+                      {user.role === "ngo" && (
+                        <DropdownMenuItem asChild>
+                          <Link to="/dashboard" className="flex items-center w-full">
+                            <User className="mr-2 h-4 w-4" />
+                            <span>Dashboard</span>
+                          </Link>
+                        </DropdownMenuItem>
+                      )}
+                      {user.role === "user" && (
+                        <DropdownMenuItem asChild>
+                          <Link to="/donations" className="flex items-center w-full">
+                            <Heart className="mr-2 h-4 w-4" />
+                            <span>My Donations</span>
+                          </Link>
+                        </DropdownMenuItem>
+                      )}
+                      <DropdownMenuItem onClick={handleLogout}>
+                        <LogOut className="mr-2 h-4 w-4" />
+                        <span>Logout</span>
+                      </DropdownMenuItem>
+                    </>
+                  ) : (
+                    <>
+                      <DropdownMenuItem asChild>
+                        <Link to="/login" className="flex items-center w-full">
+                          <LogIn className="mr-2 h-4 w-4" />
+                          <span>Login</span>
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/register" className="flex items-center w-full">
+                          <UserPlus className="mr-2 h-4 w-4" />
+                          <span>Register</span>
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/ngo-login" className="flex items-center w-full">
+                          <Building2 className="mr-2 h-4 w-4" />
+                          <span>NGO Login</span>
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/ngo-register" className="flex items-center w-full">
+                          <Building2 className="mr-2 h-4 w-4" />
+                          <span>NGO Register</span>
+                        </Link>
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/AppSetting" className="flex items-center w-full">
+                      <Cog className="mr-2 h-4 w-4" />
+                      <span>App Settings</span>
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         </div>
       </div>

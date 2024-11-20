@@ -12,6 +12,7 @@ import NGODetails from './pages/NGODetails';
 import Appsetting from './pages/Appsetting';
 import { Heart } from 'lucide-react';
 import useThemeStore from './store/themeStore';
+import AboutUs from './pages/Aboutus';
 
 function App() {
   const { isDarkMode } = useThemeStore();
@@ -39,6 +40,7 @@ function App() {
             <Route path="/ngos/:id" element={<NGODetails />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/AppSetting" element={<Appsetting />} />            
+            <Route path="/About" element={<AboutUs />} />            
           </Routes>
         </main>
         <footer className="bg-white dark:bg-gray-800 shadow-inner py-8 mt-16 transition-colors duration-300">

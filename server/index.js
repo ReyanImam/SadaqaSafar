@@ -9,6 +9,7 @@ import authRoutes from './routes/authRoutes.js';
 import causeRoutes from './routes/causeRoutes.js';
 import donationRoutes from './routes/donationRoutes.js';
 import ngoRoutes from './routes/ngoRoutes.js';
+import messageRoutes from './routes/messageRoutes.js';
 
 dotenv.config();
 
@@ -54,6 +55,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/donations', donationRoutes);
 app.use('/api/ngos', ngoRoutes);
 app.use('/api/causes', causeRoutes);
+app.use("/api/messages",messageRoutes)
 process.on('uncaughtException', (error) => {
   console.error('Uncaught Exception:', error);
   // Optionally: process.exit(1) to forcefully shut down the server

@@ -2,7 +2,6 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:3000/api';
 
-// Create axios instance with base URL
 const api = axios.create({
   baseURL: API_URL,
 });
@@ -15,31 +14,26 @@ export const createCause = async (causeData, token) => {
         Authorization: `Bearer ${token}`,
       },
     };
-    
+
     const response = await api.post('/causes', causeData, config);
+    console.log('API: Created cause:', response.data);
     return response.data;
   } catch (error) {
-    console.error('Error creating cause:', error.response?.data || error.message);
+    console.error('API: Error creating cause:', error.response?.data || error.message);
     throw error;
   }
 };
 
-export const getCauses = async () => {
-  try {
-    const response = await api.get('/causes');
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching causes:', error.response?.data || error.message);
-    throw error;
-  }
-};
+
 
 export const getNGOCauses = async (ngoId) => {
   try {
+    console.log('API: Fetching causes for NGO ID:', ngoId);
     const response = await api.get(`/causes/ngo/${ngoId}`);
+    console.log('API: Fetched NGO causes:', response.data);
     return response.data;
   } catch (error) {
-    console.error('Error fetching NGO causes:', error.response?.data || error.message);
+    console.error('API: Error fetching NGO causes:', error.response?.data || error.message);
     throw error;
   }
 };

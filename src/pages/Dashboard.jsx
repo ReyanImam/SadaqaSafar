@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
-import { createCause } from '../api/causes';
+import React, { useState, useEffect } from 'react';
+import { createCause, getNGOCauses } from '../api/causes';
 import useAuthStore from '../store/authStore';
 
-const Dashboard = () => {
+
+const NGODashboard = () => {
   const { user, token } = useAuthStore();
   const [showCauseModal, setShowCauseModal] = useState(false);
+  const [causes, setCauses] = useState([]);
   const [newCause, setNewCause] = useState({
     title: '',
     description: '',
@@ -13,10 +15,28 @@ const Dashboard = () => {
     endDate: ''
   });
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchCauses();
+  }, [user._id]);
+
+  const fetchCauses = async () => {
+    if (!user || !user._id) return;
+    try {
+      setLoading(true);
+      const fetchedCauses = await getNGOCauses(user._id);
+      setCauses(fetchedCauses);
+    } catch (error) {
+      setError('Failed to fetch causes. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setNewCause((prevCause) => ({
+    setNewCause(prevCause => ({
       ...prevCause,
       [name]: value,
     }));
@@ -36,19 +56,20 @@ const Dashboard = () => {
         },
         token
       );
-      console.log('Cause created successfully:', response);
       setShowCauseModal(false);
-      // Optionally, update the list of causes or show a success message
+      fetchCauses(); // Refresh the causes list
+      setNewCause({ title: '', description: '', goalAmount: '', category: '', endDate: '' });
     } catch (error) {
-      console.error("Error creating cause:", error.response?.data || error.message);
       setError(error.response?.data?.message || 'An error occurred while creating the cause');
     }
   };
 
   return (
-    <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900  dark:text-white">NGO Dashboard</h1>
+    <div className="max-w-6xl mx-auto px-4 py-8">
+      <div className="flex items-center justify-between mb-8">
+
+        <h1 className="text-3xl font-bold text-gray-900  dark:text-white">NGO Dashboard</h1>
+        
         <button 
           onClick={() => setShowCauseModal(true)}
           className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition flex items-center gap-2"
@@ -57,6 +78,30 @@ const Dashboard = () => {
           Create New Cause
         </button>
       </div>
+
+      {error && <p className="text-red-500 mb-4">{error}</p>}
+
+      {loading ? (
+        <p className="text-center text-gray-600">Loading causes...</p>
+      ) : causes.length === 0 ? (
+        <p className="text-center text-gray-600">No causes found. Create your first cause!</p>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {causes.map((cause) => (
+            <div key={cause._id} className="bg-white shadow-md rounded-lg p-6">
+              <h2 className="text-xl font-semibold mb-2">{cause.title}</h2>
+              <p className="text-gray-600 mb-4">{cause.description}</p>
+              <div className="flex justify-between items-center text-sm text-gray-500">
+                <span>Goal: ₹{cause.goalAmount}</span>
+                <span>Category: {cause.category}</span>
+              </div>
+              <div className="mt-4 text-sm text-gray-500">
+                Ends on: {new Date(cause.endDate).toLocaleDateString()}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {showCauseModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
@@ -143,10 +188,8 @@ const Dashboard = () => {
           </div>
         </div>
       )}
-      
-      {/* Rest of your dashboard content */}
     </div>
   );
 };
 
-export default Dashboard;
+export default NGODashboard;
