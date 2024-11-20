@@ -4,7 +4,7 @@ import { Heart, Users, Building2, ArrowRight, Globe, DollarSign } from 'lucide-r
 import useAuthStore from '../store/authStore';
 
 const Home = () => {
-  const { user } = useAuthStore();
+  const { user, ngo } = useAuthStore();
 
   return (
     <div className="space-y-16 dark:bg-gray-900 transition-colors duration-300">
@@ -25,7 +25,8 @@ const Home = () => {
             Explore NGOs
             <ArrowRight className="ml-2 h-5 w-5" />
           </Link>
-          {!user && (
+          {/* Conditionally render these buttons based on whether a user is logged in */}
+          {!user && !ngo && (
             <>
               <Link
                 to="/ngo-register"

@@ -24,10 +24,8 @@ const Login = () => {
       setUser(response);
       setToken(response.token);
       if (response.role === 'user') {
-        navigate('/dashboard');
-      } else if (response.role === 'ngo') {
-        navigate('/ngo-dashboard');
-      } else {
+        navigate('/');
+      }  else {
         setError('Invalid user role');
       }
     } catch (err) {

@@ -36,7 +36,7 @@ const Register = () => {
       
       setUser(response);
       setToken(response.token);
-      navigate('/dashboard');
+      navigate('/');
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed');
     } finally {

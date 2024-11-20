@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
 
 const ngoSchema = new mongoose.Schema({
   name: {
@@ -13,6 +14,11 @@ const ngoSchema = new mongoose.Schema({
     trim: true,
     lowercase: true
   },
+  password:{
+    type: String,
+    required: true,
+  
+  },
   description: {
     type: String,
     required: true
@@ -25,6 +31,11 @@ const ngoSchema = new mongoose.Schema({
     type: String,
     
     enum: ['education', 'health', 'environment', 'poverty', 'other']
+  },
+  role: {
+    type: String,
+    enum: ['user', 'ngo', 'admin'],
+    default:"ngo"
   },
   logo: {
     type: String,
@@ -62,6 +73,28 @@ const ngoSchema = new mongoose.Schema({
     default: Date.now
   }
 });
+ngoSchema.pre('save', async function(next) {
+  if (!this.isModified('password')) {
+    return next();
+  }
+  
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Method to compare password
+ngoSchema.methods.comparePassword = async function(candidatePassword) {
+  try {
+    return await bcrypt.compare(candidatePassword, this.password);
+  } catch (error) {
+    throw new Error('Password comparison failed');
+  }
+};
 
 const NGO = mongoose.model('NGO', ngoSchema);
 

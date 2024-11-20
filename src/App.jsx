@@ -38,6 +38,8 @@ function App() {
             <Route path="/ngo-register" element={<NGORegister />} />
             <Route path="/ngo-login" element={<NGOLogin />} />
             <Route path="/ngos/:id" element={<NGODetails />} />
+          
+
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/AppSetting" element={<Appsetting />} />            
             <Route path="/About" element={<AboutUs />} />            

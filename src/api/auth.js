@@ -52,7 +52,7 @@ export const registerNGO = async (ngoData) => {
 
 export const loginNGO = async (email, password) => {
   try {
-    const response = await api.post('/auth/login-NGO', {
+    const response = await api.post('/auth/login-ngo', {
       email,
       password
     });

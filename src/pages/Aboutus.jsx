@@ -3,13 +3,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Heart } from 'lucide-react'
+import potatoImage from "../potato.jpg";
 
 export default function AboutUs() {
   const founders = [
-    { name: "Aisha Rahman", role: "CEO", image: "/placeholder.svg?height=100&width=100", quote: "Empowering communities through compassion" },
-    { name: "Yusuf Ali", role: "CTO", image: "/placeholder.svg?height=100&width=100", quote: "Innovating for a better tomorrow" },
-    { name: "Fatima Hassan", role: "CFO", image: "/placeholder.svg?height=100&width=100", quote: "Ensuring transparency in every donation" },
-    { name: "Omar Khalid", role: "COO", image: "/placeholder.svg?height=100&width=100", quote: "Optimizing impact, one cause at a time" },
+    { name: "Ahmed Baig", role: "CEO", image: potatoImage, quote: "Empowering communities through compassion" },
+    { name: "Shahzeb Khan", role: "CTO", image: "/placeholder.svg?height=100&width=100", quote: "Innovating for a better tomorrow" },
+    { name: "Noor ul Talha", role: "CFO", image: "/placeholder.svg?height=100&width=100", quote: "Ensuring transparency in every donation" },
+    { name: "Reyan Imam", role: "COO", image: "/placeholder.svg?height=100&width=100", quote: "Optimizing impact, one cause at a time" },
   ]
 
   return (

@@ -6,7 +6,7 @@ import useAuthStore from '../../store/authStore';
 
 export default function NGOLogin() {
   const navigate = useNavigate();
-  const { setUser, setToken } = useAuthStore();
+  const { setNGO, setToken } = useAuthStore();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -25,9 +25,10 @@ export default function NGOLogin() {
         setError('Invalid NGO account');
         return;
       }
-      setUser(response);
+      // setUser(response);
+      setNGO(response);
       setToken(response.token);
-      navigate('/ngo-dashboard');
+      navigate('/');
     } catch (err) {
       setError(err.response?.data?.message || 'NGO Login failed');
     } finally {
